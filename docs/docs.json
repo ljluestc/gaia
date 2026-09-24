@@ -96,6 +96,7 @@
                     "group": "Developer Tools",
                     "pages": [
                       "guides/code-index",
+                      "guides/git",
                       "guides/project-map"
                     ]
                   },

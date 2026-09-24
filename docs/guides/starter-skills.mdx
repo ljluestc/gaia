@@ -209,6 +209,19 @@ function, declared in `metadata.gaia.tools` and registered as
 - **Note** — it fetches through GAIA's `WebClient`, so private and loopback
   addresses are refused.
 
+### repo-explore
+
+Clones a public repository into GAIA's sandbox and explains it: what it does, how
+it is built and laid out, who works on it, and what changed between releases.
+
+- **Demonstrates** — a skill that sequences a gated tool (`clone_repo` needs your
+  approval) with read-only ones, and treats everything it reads as untrusted.
+- **Consumes** — `clone_repo`, `analyze_repo`, `git_history`, `review_diff`,
+  `list_workspaces`, `read_file`, `search_file_content`.
+- **Configure** — nothing. `git` must be on PATH.
+- **Note** — the workspace tools are only registered on the flagship `gaia`
+  agent. See [Repository Workspaces](/guides/git) for the security model.
+
 ### image-gen
 
 Turns "draw me a red bicycle" into a prompt worth generating, runs it through

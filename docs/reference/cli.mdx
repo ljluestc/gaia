@@ -1976,6 +1976,75 @@ Manage agent memory: run day-zero onboarding and view memory statistics.
 
 ---
 
+## Repository Workspaces
+
+<Card title="Repository Workspaces Guide" icon="code-branch" href="/guides/git">
+  Clone a public repository into a sandbox and let the agent explain it
+</Card>
+
+Manage the sandboxed clones under `~/.gaia/workspaces/`. Clones are HTTPS-only, from public hosts only, and read-only once cloned.
+
+### Commands
+
+<Tabs>
+  <Tab title="clone">
+    Clone a public repository into a workspace.
+
+    ```bash
+    gaia git clone <owner/repo | https-url> [OPTIONS]
+    ```
+
+    | Option | Default | Description |
+    |--------|---------|-------------|
+    | `--depth N` | `1` | Commits of history to fetch; `0` for full history |
+    | `--branch NAME` | default branch | Branch or tag to check out |
+    | `--max-size-mb N` | `500` | Abort and remove the clone past this size |
+    | `--json` | off | Emit the workspace record as JSON |
+
+    ```bash
+    gaia git clone amd/gaia
+    gaia git clone https://gitlab.com/group/project --depth 0
+    ```
+
+    Cloning a repository that is already there returns the existing workspace instead of cloning it again.
+  </Tab>
+
+  <Tab title="analyze">
+    Profile a cloned repository: languages, frameworks, manifests, entry points, license, layout, tests, and CI.
+
+    ```bash
+    gaia git analyze <owner/repo | host/owner/repo> [--json]
+    ```
+  </Tab>
+
+  <Tab title="list">
+    List workspaces with branch, size, last use, and a `[stale]` flag for anything unused for 7+ days.
+
+    ```bash
+    gaia git list [--json]
+    ```
+  </Tab>
+
+  <Tab title="clean">
+    Remove workspaces. With no option it removes the stale ones.
+
+    ```bash
+    gaia git clean [--older-than-days N | --all | --name NAME] [--dry-run]
+    ```
+
+    | Option | Description |
+    |--------|-------------|
+    | `--older-than-days N` | Remove workspaces unused for N+ days (default `7`) |
+    | `--all` | Remove every workspace |
+    | `--name NAME` | Remove one workspace |
+    | `--dry-run` | Print what would be removed |
+  </Tab>
+</Tabs>
+
+[→ Full Repository Workspaces Guide](/guides/git)
+
+---
+
 ## Skills
 
 <Card title="Agent Skills Spec" icon="puzzle-piece" href="/spec/agent-skills">

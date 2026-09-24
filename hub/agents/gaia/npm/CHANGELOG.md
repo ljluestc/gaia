@@ -62,6 +62,16 @@ the terminal UI meant building it from source.
   Generating swaps the resident model, so the next reply waits for the chat model
   to reload. The `image-gen` starter skill covers prompt expansion and iterating
   on the previous image.
+- **"Clone this repo and tell me what it does."** The agent can now clone a
+  public repository into a sandbox under `~/.gaia/workspaces` and explain it:
+  tech stack, layout, entry points, license, commit history, contributors, and
+  the changes between two releases. Adds `clone_repo`, `analyze_repo`,
+  `git_history`, `review_diff`, and `list_workspaces` (81 tools → 86) plus a
+  `git_repo` bundle. `clone_repo` is confirmation-gated and refused over
+  `/query` like the other gated tools (SKILL §8). Clones are HTTPS-only, from
+  public hosts only, capped at 500 MB, and read-only afterwards. The new
+  `repo-explore` starter skill drives the tools, and `gaia git clean` removes
+  stale workspaces.
 - TUI provider setup for Local, Fireworks AI, and AMD LLM Gateway, with masked
   runtime API keys, discovered models, and remote-inference status.
 

@@ -60,11 +60,13 @@ _spec.loader.exec_module(capability_matrix)
 
 # 81: 69 after #3023's `remember_skill_lesson`, plus the email and image_gen
 # bundles and `run_python` from main, and this branch's `capture_skill`.
-_EXPECTED_TOOLS_TOTAL = 81
+# 86: plus the five git workspace tools (#861).
+_EXPECTED_TOOLS_TOTAL = 86
 # 11 since #3235 put `load_skill` in the core set: the shortlist prompt tells
 # the model to call it even when the skills bundle was not selected.
 _EXPECTED_CORE_COUNT = 15
-_EXPECTED_BUNDLE_COUNT = 21
+# 22: plus `git_repo` (#861).
+_EXPECTED_BUNDLE_COUNT = 22
 
 _EXPECTED_SKILL_LIBRARY_TOOLS = frozenset(
     {

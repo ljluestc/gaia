@@ -2948,6 +2948,11 @@ Examples:
 
     skills_cli.add_subparser(subparsers)
 
+    # Sandboxed repository workspaces (issue #861) — clone, analyze, clean.
+    from gaia.git import cli as git_cli
+
+    git_cli.add_subparser(subparsers)
+
     # Persistent CLI config (~/.gaia/config.json) — e.g. a default model so
     # users don't have to pass --model on every chat/llm/prompt (issue #98).
     config_parser = subparsers.add_parser(
@@ -4494,6 +4499,13 @@ Let me know your answer!
         from gaia.skills import cli as skills_cli  # pylint: disable=reimported
 
         rc = skills_cli.handle(args)
+        sys.exit(rc)
+
+    # Handle git workspace command (issue #861)
+    if args.action == "git":
+        from gaia.git import cli as git_cli  # pylint: disable=reimported
+
+        rc = git_cli.handle(args)
         sys.exit(rc)
 
     # Handle Diagnostics command

@@ -337,6 +337,23 @@ FULL_BUNDLES = [
         description="Semantic search over a codebase (index, search, status).",
     ),
     ToolBundle(
+        name="git_repo",
+        members=frozenset(
+            {
+                "clone_repo",
+                "analyze_repo",
+                "git_history",
+                "review_diff",
+                "list_workspaces",
+            }
+        ),
+        description=(
+            "Clone a public GitHub or git repository into a sandbox and explore "
+            "it: what the project does, its tech stack, commit history, "
+            "contributors, and the changes between releases or branches."
+        ),
+    ),
+    ToolBundle(
         name="skills",
         members=frozenset(
             {
@@ -478,8 +495,8 @@ FULL_BUNDLES = [
 #    on PATH; ChatAgent skips it rather than register a tool whose backend
 #    always fails. (``search_web`` is NOT optional here: the browser mixin
 #    registers it unconditionally for this profile.)
-# 2. Subclass-provided mixins -- the skill-library, skill-learning, and
-#    code-index tools come from GaiaAgent, so a plain ChatAgent on
+# 2. Subclass-provided mixins -- the skill-library, skill-learning,
+#    code-index, and git workspace tools come from GaiaAgent, so a plain ChatAgent on
 #    prompt_profile="full" has none.
 # 3. Memory. MemoryMixin registers nothing when the embedder is unreachable, so
 #    a degraded-but-running agent has a store and no memory tools. Selection
@@ -502,6 +519,11 @@ FULL_OPTIONAL_TOOLS = frozenset(
         "search_code_index",
         "get_index_status",
         "clear_code_index",
+        "clone_repo",
+        "analyze_repo",
+        "git_history",
+        "review_diff",
+        "list_workspaces",
         "list_skills",
         "load_skill",
         "unload_skill",

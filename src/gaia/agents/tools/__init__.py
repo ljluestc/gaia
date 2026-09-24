@@ -13,6 +13,7 @@ from .file_io_tools import FileIOToolsMixin
 from .file_monitor_tools import FileToolsMixin
 from .file_tools import FileSearchToolsMixin
 from .filesystem_tools import FileSystemToolsMixin
+from .git_tools import GitToolsMixin
 from .rag_tools import RAGToolsMixin
 from .scratchpad_tools import ScratchpadToolsMixin
 from .screenshot_tools import ScreenshotToolsMixin
@@ -26,6 +27,7 @@ __all__ = [
     "FileSearchToolsMixin",
     "FileToolsMixin",
     "FileSystemToolsMixin",
+    "GitToolsMixin",
     "RAGToolsMixin",
     "ScratchpadToolsMixin",
     "ScreenshotToolsMixin",

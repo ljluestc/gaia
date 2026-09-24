@@ -84,6 +84,7 @@ setup(
         "gaia.vlm",
         "gaia.api",
         "gaia.filesystem",
+        "gaia.git",
         "gaia.scratchpad",
         "gaia.web",
         "gaia.code_index",

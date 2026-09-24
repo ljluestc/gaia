@@ -158,6 +158,7 @@ def registry_tool_names(tmp_path_factory) -> frozenset[str]:
     from gaia.agents.tools.file_io_tools import FileIOToolsMixin
     from gaia.agents.tools.file_tools import FileSearchToolsMixin
     from gaia.agents.tools.filesystem_tools import FileSystemToolsMixin
+    from gaia.agents.tools.git_tools import GitToolsMixin
     from gaia.agents.tools.rag_tools import RAGToolsMixin
     from gaia.agents.tools.scratchpad_tools import ScratchpadToolsMixin
     from gaia.agents.tools.shell_tools import ShellToolsMixin
@@ -188,6 +189,7 @@ def registry_tool_names(tmp_path_factory) -> frozenset[str]:
         (AudioToolsMixin, "register_audio_tools"),
         (MemoryMixin, "register_memory_tools"),
         (EmailToolsMixin, "register_email_tools"),
+        (GitToolsMixin, "register_git_tools"),
     ]
 
     before = dict(_TOOL_REGISTRY)

@@ -1,0 +1,106 @@
+---
+title: "Repository Workspaces"
+description: "Clone a public repository into a sandbox and have the agent explain what it does, how it's built, and what changed."
+icon: "code-branch"
+---
+
+<Info>
+  **Source Code:** [`src/gaia/git/`](https://github.com/amd/gaia/blob/main/src/gaia/git/) and [`src/gaia/agents/tools/git_tools.py`](https://github.com/amd/gaia/blob/main/src/gaia/agents/tools/git_tools.py)
+</Info>
+
+Ask the [GAIA agent](/guides/gaia) *"clone pallets/click and tell me what it does"* and it clones the repository into a sandbox, profiles it, reads the files that matter, and answers. Nothing outside `~/.gaia/workspaces/` is touched, and none of the repository's code is run.
+
+The capability comes in three parts:
+
+- **Tools**: `GitToolsMixin`, composed by the flagship agent and by any custom agent through `KNOWN_TOOLS["git"]`.
+- **Skill**: the [`repo-explore`](/guides/starter-skills) starter skill, which tells the agent how to use the tools well.
+- **CLI**: `gaia git` for cloning, profiling, and cleaning up workspaces yourself.
+
+## Quick start
+
+<Steps>
+  <Step title="Ask the agent">
+    ```text
+    Clone https://github.com/pallets/click and tell me what it does.
+    ```
+
+    You approve the clone. The agent then profiles the repository, reads its README and entry points, and explains what it is for, how it's built, and how the code is laid out.
+  </Step>
+  <Step title="Ask follow-ups">
+    ```text
+    Who works on it, and how active is it?
+    What changed between 8.1.0 and 8.2.0?
+    ```
+
+    History and diffs need the full history, so the agent re-clones with `depth=0` when it has to. It says so rather than treating a one-commit shallow clone as the whole history.
+  </Step>
+  <Step title="Clean up">
+    ```bash
+    gaia git list
+    gaia git clean          # removes workspaces unused for 7+ days
+    ```
+  </Step>
+</Steps>
+
+## Tools
+
+| Tool | What it does | Approval |
+|------|--------------|----------|
+| `clone_repo(url, depth=1, branch="")` | Clones into `~/.gaia/workspaces/<host>/<owner>/<repo>/`. An existing workspace is returned as-is. | Required |
+| `analyze_repo(workspace)` | Languages, frameworks, manifests, entry points, license, top-level layout, test and CI counts, and the start of the README. Reads files only. | No |
+| `git_history(workspace, since, author, max_commits)` | Recent commits, top contributors, date range, and counts by conventional-commit type. | No |
+| `review_diff(workspace, base, head="HEAD")` | Commits between two revisions, per-file line counts, and the patch, capped at 20,000 characters by default. | No |
+| `list_workspaces()` | Every workspace with branch, size, last use, and a `stale` flag. | No |
+
+`url` takes `owner/repo` for GitHub or a full `https://<host>/<owner>/<repo>` URL for any other public host. The agent reads files with its ordinary file tools, using the `path` each result returns.
+
+## Security model
+
+| Guard | What it prevents |
+|-------|------------------|
+| HTTPS only, and URLs carrying credentials are refused | Fetching over an unauthenticated or local transport (`ssh://`, `git://`, `file://`, `ext::`) |
+| The host must resolve to a public address, git is pinned to that vetted address, and redirects are off | Using a clone, or a DNS answer that changes mid-clone, to reach a machine on your network |
+| git runs with an empty `HOME`, so system and global config and `~/.netrc` are never read; `GIT_*` variables are dropped, and prompts and credential helpers are off | Sending a stored credential, or saving one |
+| No hook templates, no submodules, and `core.symlinks=false` | A checked-in symlink pointing out of the sandbox, or anything the repository could execute |
+| 500 MB cap enforced during the clone, plus a 10-minute timeout | Filling the disk. An oversized clone is stopped and removed. |
+| Only read-only subcommands run after the clone (`log`, `diff`, `show`, `rev-parse`, `ls-files`, …) | `push`, `commit`, `merge`, `checkout`, `fetch`, and every other write |
+
+The general shell tool still can't run `git clone`. `clone_repo` is the only way in.
+
+<Warning>
+  Treat a cloned repository as untrusted input. The `repo-explore` skill tells the agent to report instructions it finds in a README or commit message, never to follow them, and never to run or install the project.
+</Warning>
+
+## Limits in this version
+
+- **git 2.37 or newer.** Older versions can't pin the vetted address, so the clone is refused rather than run unpinned.
+- **Empty repositories are refused.** There is nothing to explore.
+- **Public repositories only.** There is no credential storage, so private repositories fail with *"does not exist or is private"*.
+- **`<host>/<owner>/<repo>` only.** Nested groups such as GitLab subgroups are not supported.
+- **Renamed repositories** must be cloned by their new URL, because redirects are not followed.
+- **Shallow by default.** `depth=1` is enough to read the code. Use `depth=0` for history and diffs; to change the depth of an existing workspace, remove it with `gaia git clean --name <workspace>` and clone again.
+
+## CLI
+
+```bash
+gaia git clone <owner/repo | https-url> [--depth N] [--branch NAME] [--max-size-mb N]
+gaia git analyze <workspace> [--json]
+gaia git list [--json]
+gaia git clean [--older-than-days N | --all | --name NAME] [--dry-run]
+```
+
+Full options are in the [CLI reference](/reference/cli#repository-workspaces). Set `GAIA_HOME` to move the workspace root along with the rest of GAIA's state.
+
+## Use it in a custom agent
+
+```python
+from gaia.agents.base.agent import Agent
+from gaia.agents.tools.git_tools import GitToolsMixin
+
+
+class RepoScout(Agent, GitToolsMixin):
+    def _register_tools(self):
+        self.register_git_tools()
+```
+
+The mixin is also available by name as `git` in [`KNOWN_TOOLS`](/sdk/mixins/tool-mixins#composable-mixins-registry), so BuilderAgent can scaffold it for you.

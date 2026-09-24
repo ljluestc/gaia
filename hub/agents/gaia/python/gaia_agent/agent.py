@@ -64,6 +64,7 @@ from gaia.agents.base.skill_loader import (
 )
 from gaia.agents.tools.code_index_tools import CodeIndexToolsMixin
 from gaia.agents.tools.email_tools import EmailToolsMixin
+from gaia.agents.tools.git_tools import GitToolsMixin
 from gaia.agents.tools.skill_learning_tools import SkillLearningToolsMixin
 from gaia.agents.tools.skill_library_tools import SkillLibraryToolsMixin
 from gaia.connectors.providers.base import ConnectorRequirement
@@ -245,6 +246,7 @@ class GaiaAgent(
     SkillLearningToolsMixin,
     CodeIndexToolsMixin,
     EmailToolsMixin,
+    GitToolsMixin,
 ):
     """The flagship GAIA agent — conversation, documents, data, web, and skills."""
 
@@ -263,8 +265,9 @@ class GaiaAgent(
     # into the system prompt — never without the human seeing the request.
     # remember_skill_lesson deliberately is not: it writes only to this agent's
     # own memory, applies at once, announces itself, and undoes in one command.
+    # clone_repo downloads third-party code to disk, so the user sees the URL first.
     CONFIRMATION_REQUIRED_TOOLS: ClassVar[frozenset] = frozenset(
-        {"install_skill", "capture_skill", "remove_skill"}
+        {"install_skill", "capture_skill", "remove_skill", "clone_repo"}
     )
 
     def __init__(self, config: Optional[GaiaAgentConfig] = None, **kwargs):
@@ -293,8 +296,8 @@ class GaiaAgent(
 
         Skill-library tools go first: ChatAgent's registration ends with
         ``_snapshot_tools()``, and anything registered after that snapshot is
-        absent from this instance's registry. Code-index and email tools join
-        them for the same reason.
+        absent from this instance's registry. Code-index, email and git
+        workspace tools join them for the same reason.
 
         Semantic code search is what makes this agent usable ON a codebase
         rather than merely in one: grep finds a string, this finds the function
@@ -330,6 +333,7 @@ class GaiaAgent(
         self._init_code_index_state(repo_path=index_root, ceiling_paths=allowed)
         self.register_code_index_tools()
         self.register_email_tools()
+        self.register_git_tools()
         super()._register_tools()
 
     # ── lazy skill-body loader (#2848 follow-up) ────────────────────────────

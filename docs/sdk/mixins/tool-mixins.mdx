@@ -44,6 +44,7 @@ Each row is the exact `name → module.Class` mapping the registry resolves:
 | `browser` | `from gaia.agents.tools.browser_tools import BrowserToolsMixin` | Web search, page fetch, download |
 | `sd` | `from gaia.sd.mixin import SDToolsMixin` | Stable Diffusion image generation |
 | `vlm` | `from gaia.vlm.mixin import VLMToolsMixin` | Vision LLM / structured extraction |
+| `git` | `from gaia.agents.tools.git_tools import GitToolsMixin` | Clone public repositories into a sandbox and explore them read-only ([guide](/guides/git)) |
 
 The sections below show usage patterns for the most common mixins; the
 `file_io` mixin has its own spec at [FileIOToolsMixin](/spec/file-io-tools-mixin).

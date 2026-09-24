@@ -327,15 +327,16 @@ Rules a client must respect:
 Read this before you design a workflow around it. This section is about the HTTP
 surface — the agent's other transport can collect an approval; see SPEC §5.5.
 
-Nine of the agent's tools mutate the machine and need explicit approval
+Ten of the agent's tools mutate the machine and need explicit approval
 before they run. Six sit in the base `TOOLS_REQUIRING_CONFIRMATION` set —
 **`write_file`**, **`edit_file`**, **`run_shell_command`**,
 **`execute_python_file`**, **`run_python`**, and **`notify_desktop`**, which
 spawns a PowerShell child on Windows to draw the notification — and the
-flagship adds three of its own (`CONFIRMATION_REQUIRED_TOOLS`):
+flagship adds four of its own (`CONFIRMATION_REQUIRED_TOOLS`):
 **`install_skill`**, **`capture_skill`**, and **`remove_skill`**, because
 installing or capturing a skill writes third-party content under
-`~/.gaia/skills` and removing one deletes it. A capture that does land is
+`~/.gaia/skills` and removing one deletes it, and **`clone_repo`**, because it
+downloads a third-party repository into `~/.gaia/workspaces`. A capture that does land is
 additionally **code-inert**: its instructions load, but any `tools.py`/scripts
 stay unregistered until a human runs `gaia skill promote <name>` in a
 terminal. Everything else — reading, indexing, querying, web fetching,
@@ -356,7 +357,7 @@ data: {"type":"needs_confirmation","run_id":"…","action":"write_file","summary
 data: {"type":"final","answer":"I stopped before running 'write_file' because it needs your explicit approval, and this streaming surface cannot collect that yet. …"}
 ```
 
-So: **`/query` cannot run any of those nine tools.** If your integration needs
+So: **`/query` cannot run any of those ten tools.** If your integration needs
 that, drive the agent from a surface that can prompt — its stdio transport is the
 one that can, because its control channel carries an approval back to a turn
 already in flight (SPEC §5.5) — or perform the mutation yourself from your own
